@@ -10,7 +10,7 @@
 | Module | Name | Owner | Depends On |
 |--------|------|-------|------------|
 | A | Booking & Queue System | You | Module C (auth, shared models) |
-| B | Staff Management System | Teammate | Module C + Module A queue events |
+| B | Teacher Management System | Teammate | Module C + Module A queue events |
 | C | Core Shared System | Both | — (foundational) |
 
 > Start with Module C. Neither A nor B can function without the shared auth, data models, and WebSocket infrastructure it provides.
@@ -24,7 +24,7 @@ Both developers must agree on and implement this together before building A or B
 ### 1. Authentication
 
 - JWT-based login
-- Roles: `parent`, `teacher`, `assistant`, `branch_admin`, `super_admin`
+- Roles: `parent`, `teacher`, `branch_admin`, `super_admin`
 - Every protected route checks role from the JWT payload
 
 **API Contract (shared):**
@@ -61,7 +61,7 @@ Three shared channels — both modules publish/subscribe:
 | Channel | Publisher | Subscribers |
 |---------|-----------|-------------|
 | `queue:{section_id}` | Module A | Module A frontend, Module B frontend |
-| `task:{staff_id}` | Module B | Module B frontend |
+| `task:{teacher_id}` | Module B | Module B frontend |
 | `notification:{user_id}` | Both | Any client |
 
 WebSocket endpoint: `WS /ws/{channel}`
@@ -153,61 +153,45 @@ Agree on the exact response shape of `GET /queue/{section_id}` with your teammat
 
 ---
 
-## Module B — Staff Management System
+## Module B — Teacher Management System
 
-**Teammate's responsibility.** Teachers and assistants manage student preparation and execute pickups.
+**Teammate's responsibility.** The teacher manages the queue and executes student pickups directly — one teacher per class, direct connection to parents.
 
 ### Frontend Pages
 
 **Teacher Dashboard**
-- View live queue for their section (reads Module A's WebSocket)
-- Call next student (triggers task creation)
-
-**Assistant Dashboard**
-- View assigned tasks (student preparation)
-- Mark student as ready at gate
-
-**Pickup Control Panel**
+- View live queue for their class (reads Module A's WebSocket)
+- Call next student from queue
 - Confirm student handover to parent
 - Log no-shows or incorrect bookings
 
 ### Backend Services
 
-#### 1. Task Engine
+#### 1. Pickup Service
 ```
-POST /task/create           body: { student_id, staff_id, type }
-GET  /tasks/{staff_id}      → list of pending tasks
-POST /task/complete         body: { task_id }
-```
-
-Tasks are created when a teacher advances the queue (calls next student). Each task is assigned to an assistant.
-
-#### 2. Attendance / Pickup Service
-```
-POST /student/picked        body: { booking_id, staff_id }  → notifies Module A
-POST /student/no-show       body: { booking_id }            → notifies Module A
+POST /student/picked        body: { booking_id, teacher_id }  → notifies Module A
+POST /student/no-show       body: { booking_id }              → notifies Module A
 ```
 
-These endpoints must call `PATCH /booking/{id}/status` from Module A after recording the event.
+Both endpoints must call `PATCH /booking/{id}/status` from Module A after recording the event.
 
-#### 3. Staff Workflow Engine
-- Teacher marks "send to gate" → assistant gets a task → assistant confirms ready → teacher confirms handover
-- Each step emits to the relevant WebSocket channel
+#### 2. Attendance Log
+- Records every pickup outcome (picked, no-show) with timestamp
+- Linked to the booking and the teacher who confirmed it
 
 ### Database Tables (Module B owns these)
 
 | Table | Key Fields |
 |-------|-----------|
-| `Task` | id, student_id, assigned_to, type, status, created_at |
-| `AttendanceLog` | id, student_id, booking_id, outcome, timestamp |
+| `AttendanceLog` | id, student_id, booking_id, teacher_id, outcome, timestamp |
 
-> `Staff` user records live in the shared `User` table (Module C). Do not duplicate.
+> Teacher user records live in the shared `User` table (Module C). Do not duplicate.
 
 ### Integration Points with Module A
 
 Module B **reads** from Module A:
-- `GET /queue/{section_id}` — to display current queue on teacher dashboard
-- `WS /ws/queue:{section_id}` — live updates without polling
+- `GET /queue/{section_id}` — current queue displayed on teacher dashboard
+- `WS /ws/queue:{section_id}` — live queue updates without polling
 
 Module B **writes** to Module A:
 - `PATCH /booking/{id}/status` — after pickup confirmation or no-show
@@ -215,9 +199,7 @@ Module B **writes** to Module A:
 ### Deliverables Checklist
 
 - [ ] Teacher can view live queue (via Module A API + WebSocket)
-- [ ] Teacher can trigger "send to gate" for next student
-- [ ] Task is created and assigned to assistant
-- [ ] Assistant marks student as ready
+- [ ] Teacher can call next student from queue
 - [ ] Pickup confirmation updates booking status in Module A
 - [ ] No-show is logged and queue is updated
 
