@@ -7,9 +7,9 @@ from app.core.database import Base
 class Section(Base):
     __tablename__ = "sections"
 
-    id: Mapped[str] = mapped_column(String, primary_key=True, default=lambda: str(uuid.uuid4()))
-    class_id: Mapped[str] = mapped_column(String, ForeignKey("classes.id"), nullable=False)
-    name: Mapped[str] = mapped_column(String, nullable=False)
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
+    class_id: Mapped[str] = mapped_column(String(36), ForeignKey("classes.id"), nullable=False)
+    name: Mapped[str] = mapped_column(String(255), nullable=False)
 
     class_: Mapped["Class"] = relationship("Class", back_populates="sections")
     students: Mapped[list["Student"]] = relationship("Student", back_populates="section")
