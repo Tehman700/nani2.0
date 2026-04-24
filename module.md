@@ -41,7 +41,6 @@ Organization
         └── Class
               └── Section
                     ├── Teacher (1)
-                    ├── Assistants (n)
                     ├── Students (n)
                     └── Parents (via students)
 ```
