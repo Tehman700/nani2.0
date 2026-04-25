@@ -38,7 +38,7 @@ def today_queue(
             "position": i,
             "booking_id": b.id,
             "status": b.status.value,
-            "pickup_time": b.pickup_time.isoformat(),
+            "pickup_time": b.pickup_time.isoformat() + "Z",
             "student": {
                 "id": b.student.id,
                 "name": b.student.name,

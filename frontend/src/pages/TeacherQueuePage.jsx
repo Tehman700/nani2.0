@@ -72,7 +72,7 @@ function QueueRow({ entry }) {
 
       <div className="text-right shrink-0">
         <p className="text-xs text-slate-300 font-medium">
-          {new Date(entry.pickup_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+          {new Date(entry.pickup_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true })}
         </p>
         <span className={`inline-block mt-1 text-xs px-2 py-0.5 rounded-full border ${STATUS_STYLES[entry.status] || STATUS_STYLES.pending}`}>
           {STATUS_LABELS[entry.status] || entry.status}

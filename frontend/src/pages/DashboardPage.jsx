@@ -204,7 +204,7 @@ function QueueCard({ sectionId }) {
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium text-slate-200 truncate">{entry.student.name}</p>
-                <p className="text-xs text-slate-500">{new Date(entry.pickup_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
+                <p className="text-xs text-slate-500">{new Date(entry.pickup_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true })}</p>
               </div>
               <StatusChip status={entry.status} />
             </div>
@@ -266,7 +266,8 @@ function BookingsList({ refresh }) {
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium text-slate-200">{entry.student.name}</p>
                 <p className="text-xs text-slate-500 mt-0.5">
-                  {new Date(entry.pickup_time).toLocaleString([], { dateStyle: 'short', timeStyle: 'short' })}
+                  {new Date(entry.pickup_time).toLocaleDateString([], { dateStyle: 'short' })}{' '}
+                  {new Date(entry.pickup_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true })}
                 </p>
                 <div className="mt-2">
                   <StatusChip status={entry.status} />
