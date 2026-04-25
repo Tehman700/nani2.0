@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(alembic revision *)",
+      "Bash(npm install *)",
+      "Bash(npm run *)"
+    ]
+  }
+}

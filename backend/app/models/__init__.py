@@ -6,6 +6,8 @@ from app.models.section import Section
 from app.models.user import User
 from app.models.parent import Parent
 from app.models.student import Student
+from app.models.booking import Booking, BookingStatus
+from app.models.queue_entry import QueueEntry
 
 __all__ = [
     "UserRole",
@@ -16,4 +18,7 @@ __all__ = [
     "User",
     "Parent",
     "Student",
+    "Booking",
+    "BookingStatus",
+    "QueueEntry",
 ]

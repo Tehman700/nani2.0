@@ -1,0 +1,91 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* { font-family: 'DM Sans', sans-serif; }
+
+body {
+  background-color: #060f1a;
+  color: #f1f5f9;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Dot-grid atmosphere */
+.dot-bg {
+  background-image: radial-gradient(rgba(56,189,248,0.07) 1px, transparent 1px);
+  background-size: 28px 28px;
+}
+
+/* Glowing card border */
+.card-glow {
+  box-shadow: 0 0 0 1px rgba(56,189,248,0.12), 0 8px 32px rgba(0,0,0,0.4);
+}
+
+.card-glow:focus-within {
+  box-shadow: 0 0 0 1px rgba(56,189,248,0.3), 0 8px 32px rgba(0,0,0,0.5);
+}
+
+/* Input fields */
+.field {
+  @apply w-full bg-navy-900 border border-navy-600 rounded-lg px-4 py-3
+         text-slate-100 placeholder-slate-500 text-sm
+         focus:outline-none focus:border-sky-400 focus:ring-1 focus:ring-sky-400/30
+         transition-all duration-200;
+}
+
+/* Primary button */
+.btn-primary {
+  @apply w-full bg-sky-400 text-navy-900 font-display font-bold tracking-wide
+         rounded-lg py-3 px-6 text-sm
+         hover:bg-sky-300 active:scale-[0.98]
+         transition-all duration-150 disabled:opacity-50 disabled:cursor-not-allowed;
+  font-weight: 700;
+}
+
+/* Ghost button */
+.btn-ghost {
+  @apply border border-navy-600 text-slate-400 rounded-lg py-2.5 px-4 text-sm
+         hover:border-sky-400/40 hover:text-sky-300
+         transition-all duration-150;
+}
+
+/* Danger button */
+.btn-danger {
+  @apply border border-rose-500/30 text-rose-400 rounded-lg py-1.5 px-3 text-xs
+         hover:bg-rose-500/10 hover:border-rose-500/50
+         transition-all duration-150;
+}
+
+/* Staggered entry animation */
+.enter { animation: slide-up 0.4s ease-out forwards; opacity: 0; }
+.enter-1 { animation-delay: 0.05s; }
+.enter-2 { animation-delay: 0.12s; }
+.enter-3 { animation-delay: 0.19s; }
+.enter-4 { animation-delay: 0.26s; }
+.enter-5 { animation-delay: 0.33s; }
+
+@keyframes slide-up {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Live indicator ring */
+.live-ring::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 9999px;
+  background: #10b981;
+  animation: pulse-ring 1.6s ease-out infinite;
+}
+
+@keyframes pulse-ring {
+  0%   { transform: scale(1); opacity: 0.7; }
+  100% { transform: scale(2.4); opacity: 0; }
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: #0a1929; }
+::-webkit-scrollbar-thumb { background: #2d5282; border-radius: 3px; }
