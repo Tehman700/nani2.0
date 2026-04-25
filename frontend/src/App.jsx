@@ -7,9 +7,18 @@ import QueuePage    from './pages/QueuePage'
 import ParentKidsPage from './pages/ParentKidsPage'
 import TeacherStudentsPage from './pages/TeacherStudentsPage'
 import TeacherQueuePage from './pages/TeacherQueuePage'
+import AdminLoginPage from './pages/AdminLoginPage'
+import AdminDashboard from './pages/AdminDashboard'
 
 function PrivateRoute({ children }) {
   return auth.loggedIn() ? children : <Navigate to="/" replace />
+}
+
+function AdminRoute({ children }) {
+  if (!auth.loggedIn()) return <Navigate to="/admin-login" replace />
+  const role = auth.role()
+  if (role !== 'super_admin' && role !== 'branch_admin') return <Navigate to="/" replace />
+  return children
 }
 
 export default function App() {
@@ -23,6 +32,8 @@ export default function App() {
         <Route path="/kids"          element={<PrivateRoute><ParentKidsPage /></PrivateRoute>} />
         <Route path="/teacher"       element={<PrivateRoute><TeacherStudentsPage /></PrivateRoute>} />
         <Route path="/teacher-queue" element={<PrivateRoute><TeacherQueuePage /></PrivateRoute>} />
+        <Route path="/admin-login"   element={<AdminLoginPage />} />
+        <Route path="/admin"         element={<AdminRoute><AdminDashboard /></AdminRoute>} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>

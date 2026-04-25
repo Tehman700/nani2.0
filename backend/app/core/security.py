@@ -22,6 +22,9 @@ def verify_password(plain: str, hashed: str) -> bool:
     return pwd_context.verify(plain, hashed)
 
 
+ADMIN_VIRTUAL_ID = "__admin__"
+
+
 def create_access_token(user: User) -> str:
     payload = {
         "sub": user.id,
@@ -30,6 +33,29 @@ def create_access_token(user: User) -> str:
         "exp": datetime.now(timezone.utc) + timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES),
     }
     return jwt.encode(payload, settings.SECRET_KEY, algorithm=ALGORITHM)
+
+
+def create_admin_token() -> str:
+    from app.models.enums import UserRole
+    payload = {
+        "sub": ADMIN_VIRTUAL_ID,
+        "role": UserRole.super_admin.value,
+        "section_id": None,
+        "exp": datetime.now(timezone.utc) + timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES),
+    }
+    return jwt.encode(payload, settings.SECRET_KEY, algorithm=ALGORITHM)
+
+
+def _make_virtual_admin() -> User:
+    from app.models.enums import UserRole
+    admin = User.__new__(User)
+    admin.id         = ADMIN_VIRTUAL_ID
+    admin.name       = "Admin"
+    admin.email      = settings.ADMIN_EMAIL
+    admin.role       = UserRole.super_admin
+    admin.section_id = None
+    admin.cnic       = None
+    return admin
 
 
 def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)) -> User:
@@ -45,6 +71,9 @@ def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(
             raise credentials_exception
     except JWTError:
         raise credentials_exception
+
+    if user_id == ADMIN_VIRTUAL_ID:
+        return _make_virtual_admin()
 
     user = db.query(User).filter(User.id == user_id).first()
     if not user:
