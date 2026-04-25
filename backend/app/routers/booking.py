@@ -50,11 +50,16 @@ async def create_booking(
     db.add(booking)
     db.flush()
 
-    queue_engine.insert_into_queue(db, booking, student.section_id)
-    queue_engine.reorder_queue(db, student.section_id)
+    if student.section_id:
+        queue_engine.insert_into_queue(db, booking, student.section_id)
+        queue_engine.reorder_queue(db, student.section_id)
     db.commit()
 
-    await queue_engine.emit_queue_update(db, student.section_id)
+    if student.section_id:
+        await queue_engine.emit_queue_update(db, student.section_id)
+    if student.teacher_cnic:
+        await queue_engine.emit_teacher_update(db, student.teacher_cnic)
+
     db.refresh(booking)
     return booking
 
@@ -76,14 +81,20 @@ async def cancel_booking(
     if booking.status not in [BookingStatus.pending, BookingStatus.confirmed]:
         raise HTTPException(status_code=400, detail="Only pending or confirmed bookings can be cancelled")
 
-    section_id = booking.student.section_id
+    section_id   = booking.student.section_id
+    teacher_cnic = booking.student.teacher_cnic
     booking.status = BookingStatus.cancelled
     db.flush()
 
-    queue_engine.reorder_queue(db, section_id)
+    if section_id:
+        queue_engine.reorder_queue(db, section_id)
     db.commit()
 
-    await queue_engine.emit_queue_update(db, section_id)
+    if section_id:
+        await queue_engine.emit_queue_update(db, section_id)
+    if teacher_cnic:
+        await queue_engine.emit_teacher_update(db, teacher_cnic)
+
     return {"detail": "Booking cancelled"}
 
 

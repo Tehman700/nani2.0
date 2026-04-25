@@ -7,6 +7,7 @@ import { useQueue } from '../hooks/useQueue'
 function NavBar() {
   const navigate = useNavigate()
   function logout() { auth.clear(); navigate('/') }
+  const isParent = auth.role() === 'parent'
   return (
     <header className="border-b border-navy-700/60 bg-navy-900/80 backdrop-blur sticky top-0 z-10">
       <div className="max-w-2xl mx-auto px-4 h-14 flex items-center justify-between">
@@ -18,33 +19,64 @@ function NavBar() {
           </div>
           <span className="font-display font-bold text-white text-base tracking-tight">nani<span className="text-sky-400">2.0</span></span>
         </div>
-        <button onClick={logout} className="text-slate-400 hover:text-slate-200 text-sm transition-colors">
-          Sign out
-        </button>
+        <div className="flex items-center gap-3">
+          {isParent && (
+            <Link to="/kids" className="text-sky-400 hover:text-sky-300 text-sm font-display font-bold transition-colors">
+              My Children
+            </Link>
+          )}
+          <button onClick={logout} className="text-slate-400 hover:text-slate-200 text-sm transition-colors">
+            Sign out
+          </button>
+        </div>
       </div>
     </header>
   )
 }
 
+const TIME_SLOTS = (() => {
+  const slots = []
+  for (let h = 12; h <= 15; h++) {
+    for (let m = 0; m < 60; m += 30) {
+      if (h === 15 && m > 0) break
+      const hour12 = h > 12 ? h - 12 : h
+      const label  = `${hour12}:${String(m).padStart(2, '0')} PM`
+      const value  = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`
+      slots.push({ label, value })
+    }
+  }
+  return slots
+})()
+
 function BookingForm({ onBooked }) {
-  const [form, setForm] = useState({ student_id: '', section_id: '', pickup_time: '' })
+  const [kids, setKids]       = useState([])
+  const [form, setForm]       = useState({ student_id: '', date: '', time: '' })
   const [loading, setLoading] = useState(false)
   const [error, setError]     = useState('')
   const [open, setOpen]       = useState(false)
+
+  useEffect(() => {
+    if (open && kids.length === 0) {
+      api.get('/student/my-kids').then(setKids).catch(() => {})
+    }
+  }, [open])
+
+  const today = new Date().toISOString().split('T')[0]
 
   async function submit(e) {
     e.preventDefault()
     setError('')
     setLoading(true)
     try {
-      await api.post('/booking/create', {
-        student_id: form.student_id,
-        pickup_time: new Date(form.pickup_time).toISOString(),
-      })
-      localStorage.setItem('nani_section', form.section_id)
-      setForm({ student_id: '', section_id: form.section_id, pickup_time: '' })
+      const pickup_time = new Date(`${form.date}T${form.time}:00`).toISOString()
+      await api.post('/booking/create', { student_id: form.student_id, pickup_time })
+      const kid = kids.find(k => k.id === form.student_id)
+      if (kid?.section_id) {
+        localStorage.setItem('nani_section', kid.section_id)
+        onBooked(kid.section_id)
+      }
+      setForm(f => ({ ...f, student_id: '', time: '' }))
       setOpen(false)
-      onBooked(form.section_id)
     } catch (err) {
       setError(err.message)
     } finally {
@@ -73,26 +105,58 @@ function BookingForm({ onBooked }) {
 
       {open && (
         <form onSubmit={submit} className="px-5 pb-5 space-y-4 border-t border-navy-700/40 pt-5">
-          <div className="grid grid-cols-1 gap-4">
+          <div>
+            <label className="block text-xs text-slate-400 mb-1.5 uppercase tracking-wide font-medium">Child</label>
+            {kids.length === 0 ? (
+              <p className="text-slate-500 text-sm py-2">
+                No children added yet.{' '}
+                <Link to="/kids" className="text-sky-400 hover:text-sky-300">Add a child first →</Link>
+              </p>
+            ) : (
+              <select
+                className="field"
+                value={form.student_id}
+                onChange={e => setForm(f => ({ ...f, student_id: e.target.value }))}
+                required
+              >
+                <option value="">Select a child…</option>
+                {kids.map(k => (
+                  <option key={k.id} value={k.id}>{k.name} — {k.class_name} {k.section_name}</option>
+                ))}
+              </select>
+            )}
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs text-slate-400 mb-1.5 uppercase tracking-wide font-medium">Student ID</label>
-              <input className="field" placeholder="paste student UUID" value={form.student_id}
-                onChange={e => setForm(f => ({ ...f, student_id: e.target.value }))} required />
+              <label className="block text-xs text-slate-400 mb-1.5 uppercase tracking-wide font-medium">Date</label>
+              <input
+                type="date"
+                className="field"
+                min={today}
+                value={form.date}
+                onChange={e => setForm(f => ({ ...f, date: e.target.value }))}
+                required
+              />
             </div>
             <div>
-              <label className="block text-xs text-slate-400 mb-1.5 uppercase tracking-wide font-medium">Section ID</label>
-              <input className="field" placeholder="paste section UUID" value={form.section_id}
-                onChange={e => setForm(f => ({ ...f, section_id: e.target.value }))} required />
-              <p className="text-xs text-slate-500 mt-1">Used to subscribe to the live queue</p>
-            </div>
-            <div>
-              <label className="block text-xs text-slate-400 mb-1.5 uppercase tracking-wide font-medium">Pickup Time</label>
-              <input type="datetime-local" className="field" value={form.pickup_time}
-                onChange={e => setForm(f => ({ ...f, pickup_time: e.target.value }))} required />
+              <label className="block text-xs text-slate-400 mb-1.5 uppercase tracking-wide font-medium">Time</label>
+              <select
+                className="field"
+                value={form.time}
+                onChange={e => setForm(f => ({ ...f, time: e.target.value }))}
+                required
+              >
+                <option value="">Select time…</option>
+                {TIME_SLOTS.map(s => (
+                  <option key={s.value} value={s.value}>{s.label}</option>
+                ))}
+              </select>
             </div>
           </div>
+
           {error && <p className="text-rose-300 text-sm bg-rose-500/10 border border-rose-500/20 rounded-lg px-3 py-2">{error}</p>}
-          <button type="submit" className="btn-primary" disabled={loading}>
+          <button type="submit" className="btn-primary" disabled={loading || kids.length === 0}>
             {loading ? 'Booking…' : 'Confirm Pickup Slot'}
           </button>
         </form>

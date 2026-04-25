@@ -2,6 +2,13 @@ import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { api, auth } from '../api/client'
 
+function formatCnic(value) {
+  const digits = value.replace(/\D/g, '').slice(0, 13)
+  if (digits.length <= 5) return digits
+  if (digits.length <= 12) return `${digits.slice(0, 5)}-${digits.slice(5)}`
+  return `${digits.slice(0, 5)}-${digits.slice(5, 12)}-${digits.slice(12)}`
+}
+
 const ROLES = [
   { value: 'parent',  label: 'Parent',  desc: 'Book pickups for your child' },
   { value: 'teacher', label: 'Teacher', desc: 'Manage pickup queue for your class' },
@@ -9,7 +16,7 @@ const ROLES = [
 
 export default function RegisterPage() {
   const navigate = useNavigate()
-  const [form, setForm]   = useState({ name: '', email: '', password: '', role: 'parent' })
+  const [form, setForm]   = useState({ name: '', email: '', password: '', role: 'parent', cnic: '' })
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
 
@@ -18,9 +25,11 @@ export default function RegisterPage() {
     setError('')
     setLoading(true)
     try {
-      const data = await api.post('/auth/register', form)
+      const payload = { ...form }
+      if (!payload.cnic) delete payload.cnic
+      const data = await api.post('/auth/register', payload)
       auth.save(data)
-      navigate('/dashboard')
+      navigate(data.role === 'teacher' ? '/teacher' : '/dashboard')
     } catch (err) {
       setError(err.message)
     } finally {
@@ -104,6 +113,20 @@ export default function RegisterPage() {
                 required
               />
             </div>
+
+            {form.role === 'teacher' && (
+              <div>
+                <label className="block text-xs font-medium text-slate-400 mb-1.5 tracking-wide uppercase">CNIC</label>
+                <input
+                  className="field"
+                  placeholder="42201-1234567-1"
+                  value={form.cnic}
+                  onChange={e => setForm(f => ({ ...f, cnic: formatCnic(e.target.value) }))}
+                  required
+                />
+                <p className="text-xs text-slate-500 mt-1">Parents will link students to you using this CNIC</p>
+              </div>
+            )}
 
             {error && (
               <div className="bg-rose-500/10 border border-rose-500/20 rounded-lg px-4 py-3 text-rose-300 text-sm">

@@ -13,6 +13,7 @@ class RegisterRequest(BaseModel):
     password: str
     role: UserRole = UserRole.parent
     section_id: str | None = None
+    cnic: str | None = None  # required for teachers
 
 
 class TokenResponse(BaseModel):
@@ -20,6 +21,7 @@ class TokenResponse(BaseModel):
     token_type: str = "bearer"
     role: UserRole
     user_id: str
+    cnic: str | None = None
 
 
 class UserMeResponse(BaseModel):
@@ -28,5 +30,6 @@ class UserMeResponse(BaseModel):
     email: str
     role: UserRole
     section_id: str | None
+    cnic: str | None
 
     model_config = {"from_attributes": True}

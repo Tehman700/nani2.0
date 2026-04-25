@@ -15,7 +15,7 @@ export default function LoginPage() {
     try {
       const data = await api.post('/auth/login', form)
       auth.save(data)
-      navigate('/dashboard')
+      navigate(data.role === 'teacher' ? '/teacher' : '/dashboard')
     } catch (err) {
       setError(err.message)
     } finally {

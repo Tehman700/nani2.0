@@ -3,7 +3,11 @@
     "allow": [
       "Bash(alembic revision *)",
       "Bash(npm install *)",
-      "Bash(npm run *)"
+      "Bash(npm run *)",
+      "Bash(python3 -m alembic revision --autogenerate -m \"add_student_fields_and_user_cnic\")",
+      "PowerShell(Get-Command python -ErrorAction SilentlyContinue)",
+      "PowerShell(Get-Command python3 -ErrorAction SilentlyContinue)",
+      "PowerShell(Get-Command py -ErrorAction SilentlyContinue)"
     ]
   }
 }

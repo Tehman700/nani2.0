@@ -4,7 +4,7 @@ from app.core.config import settings
 from app.core.ws_manager import manager
 
 ALGORITHM = "HS256"
-VALID_CHANNEL_PREFIXES = ("queue:", "task:", "notification:")
+VALID_CHANNEL_PREFIXES = ("queue:", "task:", "notification:", "teacher:")
 
 router = APIRouter(tags=["websocket"])
 

@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.routers import auth, section, ws, booking, queue, location
+from app.routers import auth, section, ws, booking, queue, location, student, teacher
 import app.models  # noqa: F401 — registers all models with Base
 
 app = FastAPI(title="nani2.0 API")
@@ -19,6 +19,8 @@ app.include_router(ws.router)
 app.include_router(booking.router)
 app.include_router(queue.router)
 app.include_router(location.router)
+app.include_router(student.router)
+app.include_router(teacher.router)
 
 
 @app.get("/health")

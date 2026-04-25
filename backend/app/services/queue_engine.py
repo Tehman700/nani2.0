@@ -1,7 +1,8 @@
-from datetime import datetime
+from datetime import datetime, date
 from sqlalchemy.orm import Session
 from app.models.booking import Booking, BookingStatus
 from app.models.queue_entry import QueueEntry
+from app.models.student import Student
 from app.core.ws_manager import manager
 from app.core.redis_client import redis_client
 
@@ -89,6 +90,45 @@ def _cache_queue(section_id: str, entries: list[QueueEntry]):
         pipe.execute()
     except Exception:
         pass  # Redis is optional — app works without it
+
+
+async def emit_teacher_update(db: Session, teacher_cnic: str):
+    today_start = datetime.combine(date.today(), datetime.min.time())
+    today_end   = datetime.combine(date.today(), datetime.max.time())
+
+    bookings = (
+        db.query(Booking)
+        .join(Student, Booking.student_id == Student.id)
+        .filter(
+            Student.teacher_cnic == teacher_cnic,
+            Booking.status.in_([BookingStatus.pending, BookingStatus.confirmed]),
+            Booking.pickup_time >= today_start,
+            Booking.pickup_time <= today_end,
+        )
+        .order_by(Booking.priority_score.asc())
+        .all()
+    )
+
+    payload = [
+        {
+            "position": i,
+            "booking_id": b.id,
+            "status": b.status.value,
+            "pickup_time": b.pickup_time.isoformat(),
+            "student": {
+                "id": b.student.id,
+                "name": b.student.name,
+                "roll_number": b.student.roll_number,
+                "photo_url": b.student.photo_url,
+            },
+        }
+        for i, b in enumerate(bookings, start=1)
+    ]
+
+    await manager.broadcast(f"teacher:{teacher_cnic}", {
+        "type": "teacher_queue_update",
+        "queue": payload,
+    })
 
 
 async def emit_queue_update(db: Session, section_id: str) -> list[dict]:

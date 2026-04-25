@@ -14,6 +14,7 @@ class User(Base):
     hashed_password: Mapped[str] = mapped_column(String(255), nullable=False)
     role: Mapped[UserRole] = mapped_column(SAEnum(UserRole), nullable=False)
     section_id: Mapped[str | None] = mapped_column(String(36), ForeignKey("sections.id"), nullable=True)
+    cnic: Mapped[str | None] = mapped_column(String(20), nullable=True, index=True)
 
     section: Mapped["Section | None"] = relationship("Section", back_populates="users")
     parent_profile: Mapped["Parent | None"] = relationship("Parent", back_populates="user", uselist=False)
