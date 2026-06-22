@@ -4,8 +4,8 @@ import { api, auth } from '../api/client'
 
 export default function LoginPage() {
   const navigate = useNavigate()
-  const [form, setForm]   = useState({ email: '', password: '' })
-  const [error, setError] = useState('')
+  const [form, setForm]     = useState({ email: '', password: '' })
+  const [error, setError]   = useState('')
   const [loading, setLoading] = useState(false)
 
   async function handleSubmit(e) {
@@ -24,35 +24,26 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen dot-bg flex items-center justify-center px-4">
+    <div className="min-h-screen bg-surface flex items-center justify-center px-6">
 
-      {/* Top ambient glow */}
-      <div className="fixed top-0 left-1/2 -translate-x-1/2 w-96 h-64 bg-sky-400/5 rounded-full blur-3xl pointer-events-none" />
-
-      <div className="w-full max-w-sm enter">
+      <div className="w-full max-w-sm">
 
         {/* Brand */}
-        <div className="text-center mb-10">
-          <div className="inline-flex items-center gap-2 mb-3">
-            <div className="w-8 h-8 rounded-lg bg-sky-400/20 border border-sky-400/30 flex items-center justify-center">
-              <svg className="w-4 h-4 text-sky-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                <path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-              </svg>
-            </div>
-            <span className="font-display text-xl font-bold text-white tracking-tight">nani<span className="text-sky-400">2.0</span></span>
+        <div className="stagger delay-1 mb-14">
+          <div className="font-display text-[40px] font-bold tracking-[-0.03em] leading-none uppercase mb-2">
+            NANI 2.0
           </div>
-          <p className="text-slate-400 text-sm">Smart School Pickup System</p>
+          <p className="label-xs">Smart School Pickup System</p>
         </div>
 
-        {/* Card */}
-        <div className="bg-navy-800/80 backdrop-blur rounded-2xl p-8 card-glow">
-          <h1 className="font-display text-xl font-bold text-white mb-1">Welcome back</h1>
-          <p className="text-slate-400 text-sm mb-7">Sign in to manage pickups</p>
+        {/* Form */}
+        <div className="stagger delay-2">
+          <h1 className="font-display text-2xl font-bold tracking-tight mb-1">Welcome back</h1>
+          <p className="text-sm text-secondary mb-10">Sign in to manage pickups</p>
 
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-8">
             <div>
-              <label className="block text-xs font-medium text-slate-400 mb-1.5 tracking-wide uppercase">Email</label>
+              <label className="label-sm block mb-2">Email</label>
               <input
                 type="email"
                 className="field"
@@ -63,7 +54,7 @@ export default function LoginPage() {
               />
             </div>
             <div>
-              <label className="block text-xs font-medium text-slate-400 mb-1.5 tracking-wide uppercase">Password</label>
+              <label className="label-sm block mb-2">Password</label>
               <input
                 type="password"
                 className="field"
@@ -75,7 +66,7 @@ export default function LoginPage() {
             </div>
 
             {error && (
-              <div className="bg-rose-500/10 border border-rose-500/20 rounded-lg px-4 py-3 text-rose-300 text-sm">
+              <div className="border border-error/30 bg-error-container/40 px-4 py-3 text-error text-sm">
                 {error}
               </div>
             )}
@@ -86,12 +77,22 @@ export default function LoginPage() {
           </form>
         </div>
 
-        <p className="text-center text-sm text-slate-500 mt-6">
-          New here?{' '}
-          <Link to="/register" className="text-sky-400 hover:text-sky-300 transition-colors">
-            Create an account
-          </Link>
-        </p>
+        {/* Footer */}
+        <div className="stagger delay-3 mt-10 pt-8 border-t border-outline-variant">
+          <p className="text-sm text-secondary">
+            New here?{' '}
+            <Link to="/register" className="text-primary font-semibold hover:opacity-60 transition-opacity">
+              Create an account
+            </Link>
+          </p>
+          <p className="text-xs text-outline mt-3">
+            Admin?{' '}
+            <Link to="/admin-login" className="hover:text-primary transition-colors">
+              Admin sign in →
+            </Link>
+          </p>
+        </div>
+
       </div>
     </div>
   )

@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>NANI 2.0 – ER Diagram</title>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet"/>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',system-ui,sans-serif;background:#f9f9f9;color:#1a1c1c;-webkit-font-smoothing:antialiased}
+a{text-decoration:none;color:inherit}
+header{position:sticky;top:0;z-index:100;background:rgba(255,255,255,0.94);backdrop-filter:blur(10px);border-bottom:1px solid #cfc4c5}
+.header-inner{max-width:1400px;margin:0 auto;padding:0 40px;display:flex;align-items:center;justify-content:space-between;height:56px}
+.brand{font-family:'Hanken Grotesk',sans-serif;font-size:15px;font-weight:700;letter-spacing:-0.03em;text-transform:uppercase;white-space:nowrap}
+nav{display:flex;gap:2px;flex-wrap:wrap;align-items:center}
+nav a{font-size:10px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:#5d5f5f;padding:5px 9px;border:1px solid transparent;transition:all 0.15s;white-space:nowrap}
+nav a:hover{color:#000;border-color:#cfc4c5}
+nav a.active{color:#fff;background:#000;border-color:#000}
+main{max-width:1400px;margin:0 auto;padding:48px 40px 80px}
+.page-title{font-family:'Hanken Grotesk',sans-serif;font-size:40px;font-weight:700;letter-spacing:-0.03em;text-transform:uppercase;line-height:1;margin-bottom:8px}
+.page-sub{font-size:14px;color:#5d5f5f;margin-bottom:40px}
+.card{background:#fff;border:1px solid #cfc4c5;padding:32px 40px;overflow-x:auto;margin-bottom:24px}
+.card-label{font-family:'Hanken Grotesk',sans-serif;font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#7e7576;margin-bottom:20px}
+.notes{background:#fff;border:1px solid #cfc4c5;border-left:3px solid #000;padding:20px 24px}
+.notes h3{font-family:'Hanken Grotesk',sans-serif;font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:12px}
+.notes ul{list-style:none}
+.notes li{font-size:13px;color:#4c4546;padding:3px 0 3px 16px;position:relative}
+.notes li::before{content:'—';position:absolute;left:0;color:#7e7576}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px}
+.legend-item{display:flex;align-items:center;gap:10px;font-size:12px;color:#4c4546}
+.leg-line{width:32px;height:2px}
+</style>
+</head>
+<body>
+<header>
+  <div class="header-inner">
+    <span class="brand">NANI 2.0 – Diagrams</span>
+    <nav>
+      <a href="01_er_diagram.html" class="active">ER Diagram</a>
+      <a href="02_relational_schema.html">Relational Schema</a>
+      <a href="03_normalization.html">Normalization</a>
+      <a href="04_use_case.html">Use Case</a>
+      <a href="06_sequence_diagram.html">Sequence</a>
+    </nav>
+  </div>
+</header>
+<main>
+  <h1 class="page-title">ER Diagram</h1>
+  <p class="page-sub">Entity-Relationship diagram showing all 9 tables, their attributes, primary/foreign keys, and cardinality.</p>
+
+  <div class="card">
+    <div class="card-label">Entity-Relationship Model — 9 Entities, 11 Relationships</div>
+    <div class="mermaid">
+erDiagram
+    ORGANIZATIONS {
+        string id PK "UUID v4"
+        string name
+    }
+    BRANCHES {
+        string id PK "UUID v4"
+        string org_id FK
+        string name
+        float location_lat
+        float location_lng
+        float safe_zone_radius
+    }
+    CLASSES {
+        string id PK "UUID v4"
+        string branch_id FK
+        string name
+    }
+    SECTIONS {
+        string id PK "UUID v4"
+        string class_id FK
+        string name
+    }
+    USERS {
+        string id PK "UUID v4"
+        string name
+        string email UK
+        string hashed_password
+        enum role "parent|teacher|branch_admin|super_admin"
+        string section_id FK "nullable"
+        string cnic "nullable"
+    }
+    PARENTS {
+        string id PK "UUID v4"
+        string user_id FK "unique"
+        string phone
+    }
+    STUDENTS {
+        string id PK "UUID v4"
+        string name
+        string roll_number
+        text photo_url
+        string qr_hash UK
+        string class_name "denormalized"
+        string section_name "denormalized"
+        string teacher_name "denormalized"
+        string teacher_cnic "denormalized"
+        string section_id FK
+        string parent_id FK
+    }
+    BOOKINGS {
+        string id PK "UUID v4"
+        string student_id FK
+        string parent_id FK
+        datetime pickup_time
+        enum status "pending|confirmed|picked_up|cancelled|no_show"
+        float priority_score
+        datetime created_at
+    }
+    QUEUE_ENTRIES {
+        string id PK "UUID v4"
+        string booking_id FK "unique"
+        string section_id FK
+        int position
+        datetime entered_at
+    }
+
+    ORGANIZATIONS ||--o{ BRANCHES : "has"
+    BRANCHES ||--o{ CLASSES : "contains"
+    CLASSES ||--o{ SECTIONS : "has"
+    SECTIONS |o--o{ USERS : "assigned to"
+    USERS ||--o| PARENTS : "extends to"
+    PARENTS ||--o{ STUDENTS : "parent of"
+    SECTIONS |o--o{ STUDENTS : "enrolled in"
+    STUDENTS ||--o{ BOOKINGS : "has"
+    PARENTS ||--o{ BOOKINGS : "creates"
+    BOOKINGS ||--o| QUEUE_ENTRIES : "queues as"
+    SECTIONS ||--o{ QUEUE_ENTRIES : "manages"
+    </div>
+  </div>
+
+  <div class="notes">
+    <h3>Key Observations</h3>
+    <ul>
+      <li>All primary keys are UUID v4 strings (VARCHAR 36) — never auto-increment integers</li>
+      <li>STUDENTS has four denormalized columns: class_name, section_name, teacher_name, teacher_cnic — intentional 3NF violation for UX (see Normalization diagram)</li>
+      <li>QUEUE_ENTRIES.booking_id is UNIQUE — each booking can appear in the queue at most once</li>
+      <li>USERS.section_id is nullable — only teachers are assigned to a section</li>
+      <li>PARENTS is an extension of USERS (one-to-one) via user_id FK — role-based profile pattern</li>
+      <li>||--o{ means "one to zero-or-many" (one BRANCH has many CLASSES)</li>
+      <li>||--o| means "one to zero-or-one" (one USER has at most one PARENT profile)</li>
+      <li>|o--o{ means "zero-or-one to zero-or-many" (SECTION is optional for USERS)</li>
+    </ul>
+  </div>
+</main>
+
+<script>
+mermaid.initialize({
+  startOnLoad: true,
+  theme: 'base',
+  themeVariables: {
+    primaryColor: '#ffffff',
+    primaryBorderColor: '#1a1c1c',
+    primaryTextColor: '#1a1c1c',
+    lineColor: '#1a1c1c',
+    secondaryColor: '#f3f3f4',
+    tertiaryColor: '#eeeeee',
+    edgeLabelBackground: '#ffffff',
+    fontFamily: "'Inter', sans-serif",
+    fontSize: '13px',
+    attributeBackgroundColorEven: '#ffffff',
+    attributeBackgroundColorOdd: '#f9f9f9'
+  },
+  er: {
+    diagramPadding: 32,
+    layoutDirection: 'TB',
+    minEntityWidth: 100,
+    minEntityHeight: 75,
+    entityPadding: 15,
+    useMaxWidth: true
+  }
+});
+</script>
+</body>
+</html>

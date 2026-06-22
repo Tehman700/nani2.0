@@ -24,52 +24,72 @@ export default function AdminLoginPage() {
   }
 
   return (
-    <div className="min-h-screen dot-bg flex items-center justify-center px-4">
-      <div className="fixed top-0 left-1/2 -translate-x-1/2 w-96 h-64 bg-violet-400/5 rounded-full blur-3xl pointer-events-none" />
+    <div className="min-h-screen bg-surface flex items-center justify-center px-6">
 
-      <div className="w-full max-w-sm enter">
-        <div className="text-center mb-10">
-          <div className="inline-flex items-center gap-2 mb-3">
-            <div className="w-8 h-8 rounded-lg bg-violet-400/20 border border-violet-400/30 flex items-center justify-center">
-              <svg className="w-4 h-4 text-violet-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
-              </svg>
-            </div>
-            <span className="font-display text-xl font-bold text-white tracking-tight">nani<span className="text-violet-400">2.0</span></span>
+      <div className="w-full max-w-sm">
+
+        {/* Brand */}
+        <div className="stagger delay-1 mb-14">
+          <div className="font-display text-[40px] font-bold tracking-[-0.03em] leading-none uppercase mb-2">
+            NANI 2.0
           </div>
-          <p className="text-slate-400 text-sm">Admin Panel</p>
+          <div className="flex items-center gap-3 mt-2">
+            <p className="label-xs">Admin Panel</p>
+            <span className="inline-block border border-primary px-2 py-0.5 text-[9px] font-bold tracking-widest uppercase">
+              RESTRICTED
+            </span>
+          </div>
         </div>
 
-        <div className="bg-navy-800/80 backdrop-blur rounded-2xl p-8 card-glow">
-          <h1 className="font-display text-xl font-bold text-white mb-1">Admin Sign In</h1>
-          <p className="text-slate-400 text-sm mb-7">Restricted access — admins only</p>
+        <div className="stagger delay-2">
+          <h1 className="font-display text-2xl font-bold tracking-tight mb-1">Admin Sign In</h1>
+          <p className="text-sm text-secondary mb-10">Access restricted — authorised personnel only</p>
 
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-8">
             <div>
-              <label className="block text-xs font-medium text-slate-400 mb-1.5 tracking-wide uppercase">Email</label>
-              <input type="email" className="field" placeholder="admin@school.com"
-                value={form.email} onChange={e => setForm(f => ({ ...f, email: e.target.value }))} required />
+              <label className="label-sm block mb-2">Email</label>
+              <input
+                type="email"
+                className="field"
+                placeholder="admin@school.com"
+                value={form.email}
+                onChange={e => setForm(f => ({ ...f, email: e.target.value }))}
+                required
+              />
             </div>
             <div>
-              <label className="block text-xs font-medium text-slate-400 mb-1.5 tracking-wide uppercase">Password</label>
-              <input type="password" className="field" placeholder="••••••••"
-                value={form.password} onChange={e => setForm(f => ({ ...f, password: e.target.value }))} required />
+              <label className="label-sm block mb-2">Password</label>
+              <input
+                type="password"
+                className="field"
+                placeholder="••••••••"
+                value={form.password}
+                onChange={e => setForm(f => ({ ...f, password: e.target.value }))}
+                required
+              />
             </div>
 
             {error && (
-              <div className="bg-rose-500/10 border border-rose-500/20 rounded-lg px-4 py-3 text-rose-300 text-sm">{error}</div>
+              <div className="border border-error/30 bg-error-container/40 px-4 py-3 text-error text-sm">
+                {error}
+              </div>
             )}
 
-            <button type="submit" disabled={loading}
-              className="w-full py-2.5 rounded-xl bg-violet-500/20 border border-violet-400/30 text-violet-300 font-display font-bold text-sm hover:bg-violet-500/30 transition-all disabled:opacity-50">
+            <button type="submit" className="btn-primary" disabled={loading}>
               {loading ? 'Signing in…' : 'Sign In as Admin'}
             </button>
           </form>
         </div>
 
-        <p className="text-center text-xs text-slate-600 mt-6">
-          To create an admin: POST /auth/register with role: "super_admin"
-        </p>
+        <div className="stagger delay-3 mt-10 pt-8 border-t border-outline-variant">
+          <p className="text-xs text-outline">
+            Not an admin?{' '}
+            <a href="/" className="hover:text-primary transition-colors">
+              Return to login →
+            </a>
+          </p>
+        </div>
+
       </div>
     </div>
   )

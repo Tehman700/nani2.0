@@ -2,90 +2,221 @@
 @tailwind components;
 @tailwind utilities;
 
-* { font-family: 'DM Sans', sans-serif; }
+/* ─── Base ──────────────────────────────────────────────── */
+* { font-family: 'Inter', sans-serif; }
+h1, h2, h3, h4, .font-display { font-family: 'Hanken Grotesk', sans-serif; }
 
 body {
-  background-color: #060f1a;
-  color: #f1f5f9;
-  min-height: 100vh;
+  background-color: #f9f9f9;
+  color: #1a1c1c;
+  min-height: max(884px, 100dvh);
   -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
 }
 
-/* Dot-grid atmosphere */
-.dot-bg {
-  background-image: radial-gradient(rgba(56,189,248,0.07) 1px, transparent 1px);
-  background-size: 28px 28px;
+/* ─── Stagger animations ─────────────────────────────────── */
+.stagger {
+  animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  opacity: 0;
 }
+.delay-1 { animation-delay: 0.05s; }
+.delay-2 { animation-delay: 0.15s; }
+.delay-3 { animation-delay: 0.25s; }
+.delay-4 { animation-delay: 0.35s; }
+.delay-5 { animation-delay: 0.45s; }
+.delay-6 { animation-delay: 0.55s; }
 
-/* Glowing card border */
-.card-glow {
-  box-shadow: 0 0 0 1px rgba(56,189,248,0.12), 0 8px 32px rgba(0,0,0,0.4);
-}
-
-.card-glow:focus-within {
-  box-shadow: 0 0 0 1px rgba(56,189,248,0.3), 0 8px 32px rgba(0,0,0,0.5);
-}
-
-/* Input fields */
-.field {
-  @apply w-full bg-navy-900 border border-navy-600 rounded-lg px-4 py-3
-         text-slate-100 placeholder-slate-500 text-sm
-         focus:outline-none focus:border-sky-400 focus:ring-1 focus:ring-sky-400/30
-         transition-all duration-200;
-}
-
-/* Primary button */
-.btn-primary {
-  @apply w-full bg-sky-400 text-navy-900 font-display font-bold tracking-wide
-         rounded-lg py-3 px-6 text-sm
-         hover:bg-sky-300 active:scale-[0.98]
-         transition-all duration-150 disabled:opacity-50 disabled:cursor-not-allowed;
-  font-weight: 700;
-}
-
-/* Ghost button */
-.btn-ghost {
-  @apply border border-navy-600 text-slate-400 rounded-lg py-2.5 px-4 text-sm
-         hover:border-sky-400/40 hover:text-sky-300
-         transition-all duration-150;
-}
-
-/* Danger button */
-.btn-danger {
-  @apply border border-rose-500/30 text-rose-400 rounded-lg py-1.5 px-3 text-xs
-         hover:bg-rose-500/10 hover:border-rose-500/50
-         transition-all duration-150;
-}
-
-/* Staggered entry animation */
-.enter { animation: slide-up 0.4s ease-out forwards; opacity: 0; }
-.enter-1 { animation-delay: 0.05s; }
-.enter-2 { animation-delay: 0.12s; }
-.enter-3 { animation-delay: 0.19s; }
-.enter-4 { animation-delay: 0.26s; }
-.enter-5 { animation-delay: 0.33s; }
-
-@keyframes slide-up {
-  from { opacity: 0; transform: translateY(12px); }
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(20px); }
   to   { opacity: 1; transform: translateY(0); }
 }
 
-/* Live indicator ring */
+/* ─── Input fields — bottom-border only ─────────────────── */
+.field {
+  width: 100%;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid #7e7576;
+  padding: 8px 0;
+  color: #1a1c1c;
+  font-size: 14px;
+  font-family: 'Inter', sans-serif;
+  transition: border-color 0.2s;
+  border-radius: 0;
+}
+.field:focus {
+  outline: none;
+  border-bottom-color: #000000;
+  border-bottom-width: 2px;
+}
+.field::placeholder { color: #cfc4c5; }
+
+select.field {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  cursor: pointer;
+  padding-right: 20px;
+}
+
+/* ─── Buttons ────────────────────────────────────────────── */
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  background: #000000;
+  color: #ffffff;
+  font-family: 'Inter', sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 16px 24px;
+  border: 1px solid #000000;
+  cursor: pointer;
+  transition: background 0.3s, color 0.3s;
+  border-radius: 0;
+}
+.btn-primary:hover { background: #ffffff; color: #000000; }
+.btn-primary:disabled { opacity: 0.4; cursor: not-allowed; }
+.btn-primary:disabled:hover { background: #000000; color: #ffffff; }
+
+.btn-outline {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  background: #ffffff;
+  color: #000000;
+  font-family: 'Inter', sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 16px 24px;
+  border: 1px solid #000000;
+  cursor: pointer;
+  transition: background 0.3s, color 0.3s;
+  border-radius: 0;
+}
+.btn-outline:hover { background: #000000; color: #ffffff; }
+
+.btn-sm {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #000000;
+  color: #ffffff;
+  font-family: 'Inter', sans-serif;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 8px 14px;
+  border: 1px solid #000000;
+  cursor: pointer;
+  transition: background 0.3s, color 0.3s;
+  border-radius: 0;
+}
+.btn-sm:hover { background: #ffffff; color: #000000; }
+
+.btn-sm-outline {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  color: #000000;
+  font-family: 'Inter', sans-serif;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 8px 14px;
+  border: 1px solid #cfc4c5;
+  cursor: pointer;
+  transition: border-color 0.3s, background 0.3s, color 0.3s;
+  border-radius: 0;
+}
+.btn-sm-outline:hover { border-color: #000000; }
+
+.btn-danger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  color: #ba1a1a;
+  font-family: 'Inter', sans-serif;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 6px 12px;
+  border: 1px solid rgba(186,26,26,0.35);
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s;
+  border-radius: 0;
+}
+.btn-danger:hover { background: rgba(186,26,26,0.08); border-color: #ba1a1a; }
+
+/* ─── Cards ──────────────────────────────────────────────── */
+.card {
+  background: #ffffff;
+  border: 1px solid #cfc4c5;
+}
+.card-dark {
+  background: #000000;
+  border: 1px solid #000000;
+  color: #ffffff;
+}
+
+/* ─── Live indicator ─────────────────────────────────────── */
 .live-ring::after {
   content: '';
   position: absolute;
   inset: 0;
   border-radius: 9999px;
-  background: #10b981;
+  background: #000000;
   animation: pulse-ring 1.6s ease-out infinite;
 }
-
 @keyframes pulse-ring {
-  0%   { transform: scale(1); opacity: 0.7; }
-  100% { transform: scale(2.4); opacity: 0; }
+  0%   { transform: scale(1);   opacity: 0.7; }
+  100% { transform: scale(2.4); opacity: 0;   }
 }
 
-/* Scrollbar */
-::-webkit-scrollbar { width: 6px; }
-::-webkit-scrollbar-track { background: #0a1929; }
-::-webkit-scrollbar-thumb { background: #2d5282; border-radius: 3px; }
+/* ─── Scrollbar ──────────────────────────────────────────── */
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: #f3f3f4; }
+::-webkit-scrollbar-thumb { background: #cfc4c5; }
+
+/* ─── Drawer ─────────────────────────────────────────────── */
+.drawer {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  background: #ffffff;
+  transform: translateX(100%);
+  transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.drawer.open { transform: translateX(0); }
+
+/* ─── Label utilities ────────────────────────────────────── */
+.label-xs {
+  font-family: 'Inter', sans-serif;
+  font-size: 10px;
+  font-weight: 500;
+  line-height: 120%;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #5d5f5f;
+}
+.label-sm {
+  font-family: 'Inter', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 140%;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
